@@ -47,8 +47,9 @@ class ProgressBar(object):
         percents = format(100.00 * (iteration / float(total)), '.2f')
         bar = fc + sd + '#' * filledLength + fw + sd +'-' * (bar_length - filledLength)
         if '0.00' not in rate:
-            sys.stdout.write('\033[2K\033[1G\r\r{}{}[{}{}*{}{}] : {}{}{}/{} {}% |{}{}{}| {} {}'.format(fc,sd,fm,sb,fc,sd,fg,sb,file_size,downloaded,percents,bar,fg,sb,rate,suffix))
-            sys.stdout.flush()
+            pass
+            #sys.stdout.write('\033[2K\033[1G\r\r{}{}[{}{}*{}{}] : {}{}{}/{} {}% |{}{}{}| {} {}'.format(fc,sd,fm,sb,fc,sd,fg,sb,file_size,downloaded,percents,bar,fg,sb,rate,suffix))
+            #sys.stdout.flush()
 
     def show_progress(self, total, recvd, ratio, rate, eta):
         if total <= 1048576:
