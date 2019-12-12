@@ -481,6 +481,9 @@ class Udemy(ProgressBar):
                 if clazz == 'chapter':
                     if _last_index > 0:                    
                         _chapter_ids[_last_chapter_id] = _index - _last_index - 1
+                    else:
+                        # for chapter-less lectures
+                        _chapter_ids[_last_chapter_id] = 100
                     _last_index = _index
                     _last_chapter_id = chapter_id
             # storing last chapter info
@@ -559,8 +562,10 @@ class Udemy(ProgressBar):
                         if view_html:
                             text = '\r' + fc + sd + "[" + fm + sb + "*" + fc + sd + "] : " + fg + sb + "Downloading course information .. "
                             self._spinner(text)
-                            #lecture_index   = entry.get('object_index')
-                            lecture_index   = _chapter_lecture_stack[chapter_id].pop(0)
+                            if _chapter_lecture_stack.get(chapter_id):
+                                lecture_index   = _chapter_lecture_stack[chapter_id].pop(0)
+                            else:
+                                lecture_index   = _chapter_lecture_stack[0].pop(0)
                             lecture_title   = self._clean(self._sanitize(entry.get('title')))
                             lecture         = "{0:03d} {1!s}".format(lecture_index, lecture_title)
                             unsafe_lecture  = u'{0:03d} '.format(lecture_index) + entry.get('title')
@@ -600,9 +605,11 @@ class Udemy(ProgressBar):
 
                         if not view_html:
                             text = '\r' + fc + sd + "[" + fm + sb + "*" + fc + sd + "] : " + fg + sb + "Downloading course information .. "
-                            self._spinner(text)
-                            #lecture_index   = entry.get('object_index')
-                            lecture_index   = _chapter_lecture_stack[chapter_id].pop(0)
+                            self._spinner(text)                            
+                            if _chapter_lecture_stack.get(chapter_id):
+                                lecture_index   = _chapter_lecture_stack[chapter_id].pop(0)
+                            else:
+                                lecture_index   = _chapter_lecture_stack[0].pop(0)
                             lecture_title   = self._clean(self._sanitize(entry.get('title')))                            
                             lecture         = "{0:03d} {1!s}".format(lecture_index, lecture_title)
                             unsafe_lecture  = u'{0:03d} '.format(lecture_index) + self._clean(entry.get('title'))

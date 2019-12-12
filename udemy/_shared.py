@@ -231,7 +231,7 @@ class Downloader(object):
 
         if not self._active:
             os.rename(temp_filepath, filepath)
-            retVal = {"status": "True", "msg": "download"}
+            retVal = {"status": "True", "msg": "download", "rate": rate}
 
         return retVal
 
@@ -451,7 +451,7 @@ class UdemyLectures(object):
         except (OSError, Exception, UnicodeDecodeError) as e:
             retVal = {'status' : 'False', 'msg' : '{}'.format(e)}
         else:
-            retVal = {'status' : 'True', 'msg' : 'download'}
+            retVal = {'status' : 'True', 'msg' : 'dumped html file'}
             f.close()
 
         return retVal

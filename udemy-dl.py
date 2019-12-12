@@ -345,19 +345,21 @@ class Udemy(WebVtt2Srt, ProgressBar):
                                     in_MB = "MB " if size < 1024.00 else 'GB '
                                 sys.stdout.write('\t- ' + fg + sd + "{:<22} {:<8}{}{}{}{}\n".format(str(subtitle), subtitle.extension, sz, in_MB, fy, sb))
 
-    def download_assets(self, lecture_assets='', filepath='', unsafe=False):
+    def download_assets(self, lecture_assets='', lecture_title='', filepath='', unsafe=False):
         if lecture_assets:
-            for assets in lecture_assets:
+            retval = None
+            for assets in lecture_assets:                
                 title = assets.filename if not unsafe else "%s" % (assets)
                 mediatype = assets.mediatype
                 if mediatype == "external_link":
-                    assets.download(filepath=filepath, unsafe=unsafe, quiet=True, callback=self.show_progress)
+                    retval = assets.download(filepath=filepath, unsafe=unsafe, quiet=True, callback=self.show_progress)
                 else:
                     try:
                         retval = assets.download(filepath=filepath, unsafe=unsafe, quiet=True, callback=self.show_progress)
                     except KeyboardInterrupt:
                         sys.stdout.write (fc + sd + "\n[" + fr + sb + "-" + fc + sd + "] : " + fr + sd + "User Interrupted..\n")
-                        sys.exit(0)                    
+                        sys.exit(0)
+                self.print_download_std(retval, lecture_title, assets.extension)             
 
     def download_subtitles(self, lecture_subtitles='', filepath='', unsafe=False):
         if lecture_subtitles:
@@ -375,21 +377,25 @@ class Udemy(WebVtt2Srt, ProgressBar):
                     sys.exit(0)
                 else:
                     msg     = retval.get('msg')
-                    if msg == 'already downloaded':
+                    if msg == 'already downloaded':                        
                         self.convert(filename=filename)
+                        #sys.stdout.write (fc + sd + "[" + fm + sb + "*" + fc + sd + "] : " + fg + sd + "Subtitle " + fb + sb + "'{}' ".format(title) + fy + sb + "(already downloaded)\n")
                     elif msg == 'download':
                         self.convert(filename=filename)
+                        #sys.stdout.write (fc + sd + "[" + fm + sb + "+" + fc + sd + "] : " + fg + sd + "Subtitle " + fb + sb + "'{}' ".format(title) + fg + sb + "downloaded\n" )
                     else:
-                        sys.stdout.write (fc + sd + "[" + fm + sb + "*" + fc + sd + "] : " + fg + sd + "Subtitle : '%s' " % (title) + fc + sb + "(download skipped).\n")
+                        sys.stdout.write (fc + sd + "[" + fm + sb + "*" + fc + sd + "] : " + fg + sd + "Subtitle: '{}' ".format(title) + fc + sb + "(download skipped)\n")
                         sys.stdout.write (fc + sd + "[" + fr + sb + "-" + fc + sd + "] : " + fr + sd + "{}\n".format(msg))
 
     def download_lectures(self, lecture_best='', lecture_title='', inner_index='', lectures_count='', filepath='', unsafe=False):
-        if lecture_best:#
+        if lecture_best:
             try:
                 retval = lecture_best.download(filepath=filepath, unsafe=unsafe, quiet=True, callback=self.show_progress)
             except KeyboardInterrupt:
                 sys.stdout.write (fc + sd + "\n[" + fr + sb + "-" + fc + sd + "] : " + fr + sd + "User Interrupted..\n")
                 sys.exit(0)
+            else:
+                self.print_download_std(retval, lecture_title)
 
     def download_captions_only(self, lecture_subtitles='', lecture_assets='', filepath='', unsafe=False):
         if lecture_subtitles:
@@ -401,7 +407,7 @@ class Udemy(WebVtt2Srt, ProgressBar):
         if lecture_best:
             self.download_lectures(lecture_best=lecture_best, lecture_title=lecture_title, inner_index=inner_index, lectures_count=lectures_count, filepath=filepath, unsafe=unsafe)
         if lecture_assets:
-            self.download_assets(lecture_assets=lecture_assets, filepath=filepath, unsafe=unsafe)
+            self.download_assets(lecture_assets=lecture_assets, lecture_title=lecture_title, filepath=filepath, unsafe=unsafe)
 
     def download_lectures_and_captions(self, lecture_best='', lecture_title='', inner_index='', lectures_count='', lecture_subtitles='', lecture_assets='', filepath='', unsafe=False):
         if lecture_best:
@@ -409,7 +415,7 @@ class Udemy(WebVtt2Srt, ProgressBar):
         if lecture_subtitles:
             self.download_subtitles(lecture_subtitles=lecture_subtitles, filepath=filepath, unsafe=unsafe)
         if lecture_assets:
-            self.download_assets(lecture_assets=lecture_assets, filepath=filepath, unsafe=unsafe)
+            self.download_assets(lecture_assets=lecture_assets, lecture_title=lecture_title, filepath=filepath, unsafe=unsafe)
 
     def course_download(self, path='', quality='', caption_only=False, skip_captions=False, unsafe=False):
         if not self.cookies:
@@ -500,7 +506,8 @@ class Udemy(WebVtt2Srt, ProgressBar):
                     if not lecture_best:
                         lecture_best = lecture_best
                 if lecture.html:
-                    lecture.dump(filepath=filepath, unsafe=unsafe)
+                    retval_html = lecture.dump(filepath=filepath, unsafe=unsafe)
+                    self.print_download_std(retval_html, lecture_title)
                 self.download_lectures_only(lecture_best=lecture_best, lecture_title=lecture_title, inner_index=inner_index, lectures_count=lectures_count, lecture_assets=lecture_assets, filepath=filepath, unsafe=unsafe)
             else:
                 if quality:
@@ -514,12 +521,21 @@ class Udemy(WebVtt2Srt, ProgressBar):
                     if not lecture_best:
                         lecture_best = lecture_best
                 if lecture.html:
-                    lecture.dump(filepath=filepath, unsafe=unsafe)
+                    retval_html = lecture.dump(filepath=filepath, unsafe=unsafe)
+                    self.print_download_std(retval_html, lecture_title)
                 self.download_lectures_and_captions(lecture_best=lecture_best, lecture_title=lecture_title, inner_index=inner_index, lectures_count=lectures_count, lecture_subtitles=lecture_subtitles, lecture_assets=lecture_assets, filepath=filepath, unsafe=unsafe)
-            #inner_index += 1
-            sys.stdout.write (fc + sd + "[" + fm + sb + "+" + fc + sd + "] : " + fg + sd + "Downloaded  " + fb + sb + "'{}'\n".format(lecture_title))
+
             queue.task_done()
         return True
+
+    def print_download_std(self, retval, lecture_title='', extension='mp4'):
+        if retval:
+            if 'rate' in retval:
+                sys.stdout.write (fc + sd + "[" + fm + sb + "+" + fc + sd + "] : " + fg + sd + "Downloaded " + fb + sb + "'{}' ({})".format(lecture_title, extension) + fg + sd + " at {:.1f} KB/s\n".format(retval.get('rate')))
+            else:
+                sys.stdout.write (fc + sd + "[" + fm + sb + "+" + fc + sd + "] : " + fg + sd + "Downloaded " + fb + sb + "'{}'".format(lecture_title) + fy + sd + " ({})\n".format(retval.get('msg')))
+        else:
+            pass
 
     def chapter_download(self, chapter_number='', chapter_start='', chapter_end='', lecture_number='', lecture_start='', lecture_end='', path='', quality='', caption_only=False, skip_captions=False, unsafe=False):
         if not self.cookies:

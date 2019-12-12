@@ -81,7 +81,7 @@ class WebVtt2Srt(object):
         return u''
 
     def convert(self, filename=None, remove_vtt=True):
-        if filename:
+        if filename and os.path.exists(filename):
             seq = 1
             fname = filename.replace('.vtt', '.srt')
             content = self._vttcontents(fname=filename)
