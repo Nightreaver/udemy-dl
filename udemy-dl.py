@@ -18,11 +18,34 @@ from udemy._progress import ProgressBar
 from udemy._colorized.banner import banner
 from udemy._utils import cache_credentials
 from udemy._utils import use_cached_credentials
-from threading import Thread
+from threading import Thread, RLock
 from queue import Queue
 
 getpass = GetPass()
 
+class ThreadSafeStd(object):
+    def __init__(self, f):
+        self.f = f
+        self.lock = RLock()
+        self.nesting = 0
+
+    def _getlock(self):
+        self.lock.acquire()
+        self.nesting += 1
+
+    def _droplock(self):
+        nesting = self.nesting
+        self.nesting = 0
+        for i in range(nesting):
+            self.lock.release()
+
+    def write(self, data):
+        self._getlock()
+        self.f.write(data)
+        self._droplock()
+
+    def flush(self):
+        self.f.flush()
 
 class Udemy(WebVtt2Srt, ProgressBar):
 
@@ -31,6 +54,7 @@ class Udemy(WebVtt2Srt, ProgressBar):
         self.username   =   username
         self.password   =   password
         self.cookies    =   cookies
+        sys.stdout = ThreadSafeStd(sys.stdout)
         super(Udemy, self).__init__()
 
     def _write_to_file(self, filepath='', lecture='', names_only=False, unsafe=False):
