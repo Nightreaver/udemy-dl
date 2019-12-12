@@ -453,6 +453,8 @@ class Udemy(WebVtt2Srt, ProgressBar):
             caption_only = task[5]
             skip_captions = task[6]
 
+            sys.stdout.write(fg + sn + "Downloading '{}' ...\n".format(lecture_title))
+
             if caption_only and not skip_captions:
                 self.download_captions_only(lecture_subtitles=lecture_subtitles, lecture_assets=lecture_assets, filepath=filepath, unsafe=unsafe)
             elif skip_captions and not caption_only:
@@ -484,6 +486,7 @@ class Udemy(WebVtt2Srt, ProgressBar):
                     lecture.dump(filepath=filepath, unsafe=unsafe)
                 self.download_lectures_and_captions(lecture_best=lecture_best, lecture_title=lecture_title, inner_index=inner_index, lectures_count=lectures_count, lecture_subtitles=lecture_subtitles, lecture_assets=lecture_assets, filepath=filepath, unsafe=unsafe)
             #inner_index += 1
+            sys.stdout.write(fg + sn + "...done downloading '{}'.\n".format(lecture_title))
             queue.task_done()
         return True
 

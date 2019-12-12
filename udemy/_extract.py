@@ -468,6 +468,32 @@ class Udemy(ProgressBar):
         counter = -1
         
         if course:
+
+            # counting lectures per chapter
+            _chapter_ids = {}
+            _index = 0
+            _last_index = 0
+            _last_chapter_id = 0
+            for entry in course:
+                _index += 1
+                clazz = entry.get('_class')
+                chapter_id = entry.get('id')
+                if clazz == 'chapter':
+                    if _last_index > 0:                    
+                        _chapter_ids[_last_chapter_id] = _index - _last_index - 1
+                    _last_index = _index
+                    _last_chapter_id = chapter_id
+            # storing last chapter info
+            _chapter_ids[_last_chapter_id] = _index - _last_index
+
+            _chapter_lecture_stack = {}
+            for _chap in _chapter_ids:
+                count = _chapter_ids.get(_chap)
+                _chapter_lecture_stack[_chap] = []
+                for x in range(count):
+                    _chapter_lecture_stack[_chap].append(x+1)
+            #######
+
             for entry in course:
 
                 clazz = entry.get('_class')
@@ -479,18 +505,19 @@ class Udemy(ProgressBar):
                     chapter_index = entry.get('object_index')
                     chapter_title = self._clean(self._sanitize(entry.get('title')))
                     chapter = "{0:02d} {1!s}".format(chapter_index, chapter_title)
+                    chapter_id = entry.get("id")
                     unsafe_chapter = u'{0:02d} '.format(chapter_index) + self._clean(entry.get('title'))
                     if chapter not in _udemy['chapters']:
                         _udemy['chapters'].append({
                             'chapter_title' : chapter,
-                            'chapter_id' : entry.get("id"),
+                            'chapter_id' : chapter_id,
                             'chapter_index' : chapter_index,
                             'unsafe_chapter' : unsafe_chapter,
                             'lectures' : [],
                             })
                         counter += 1
-                elif clazz == 'lecture':
 
+                elif clazz == 'lecture':
                     lecture_id          =   entry.get("id")
                     if len(_udemy['chapters']) == 0:
                         lectures = []
@@ -509,10 +536,8 @@ class Udemy(ProgressBar):
                             counter += 1
 
                     if lecture_id:
-
                         view_html   = entry.get('view_html')
                         retVal      = []
-
 
                         if isinstance(asset, dict):
                             asset_type = asset.get('asset_type').lower() or asset.get('assetType').lower()
@@ -531,11 +556,11 @@ class Udemy(ProgressBar):
                             elif asset_type == 'audio':
                                 retVal      = self._extract_audio(asset)
 
-
                         if view_html:
                             text = '\r' + fc + sd + "[" + fm + sb + "*" + fc + sd + "] : " + fg + sb + "Downloading course information .. "
                             self._spinner(text)
-                            lecture_index   = entry.get('object_index')
+                            #lecture_index   = entry.get('object_index')
+                            lecture_index   = _chapter_lecture_stack[chapter_id].pop(0)
                             lecture_title   = self._clean(self._sanitize(entry.get('title')))
                             lecture         = "{0:03d} {1!s}".format(lecture_index, lecture_title)
                             unsafe_lecture  = u'{0:03d} '.format(lecture_index) + entry.get('title')
@@ -544,6 +569,8 @@ class Udemy(ProgressBar):
                                 sources     = data.get('sources')
                                 tracks      = data.get('tracks') if isinstance(data.get('tracks'), list) else subs
                                 duration    = data.get('duration')
+                                subtitles   = self._extract_subtitles(tracks)
+                                sources     = self._extract_sources(sources)
                                 lectures.append({
                                     'lecture_index' :   lecture_index,
                                     'lectures_id' : lecture_id,
@@ -552,10 +579,10 @@ class Udemy(ProgressBar):
                                     'duration' : duration,
                                     'assets' : retVal,
                                     'assets_count' : len(retVal),
-                                    'sources' : self._extract_sources(sources),
-                                    'subtitles' : self._extract_subtitles(tracks),
-                                    'subtitle_count' : len(self._extract_subtitles(tracks)),
-                                    'sources_count' : len(self._extract_sources(sources)),
+                                    'sources' : sources,
+                                    'subtitles' : subtitles,
+                                    'subtitle_count' : len(subtitles),
+                                    'sources_count' : len(sources),
                                     })
                             else:
                                 lectures.append({
@@ -570,11 +597,13 @@ class Udemy(ProgressBar):
                                     'subtitle_count' : 0,
                                     'sources_count' : 0,
                                     })
+
                         if not view_html:
                             text = '\r' + fc + sd + "[" + fm + sb + "*" + fc + sd + "] : " + fg + sb + "Downloading course information .. "
                             self._spinner(text)
-                            lecture_index   = entry.get('object_index')
-                            lecture_title   = self._clean(self._sanitize(entry.get('title')))
+                            #lecture_index   = entry.get('object_index')
+                            lecture_index   = _chapter_lecture_stack[chapter_id].pop(0)
+                            lecture_title   = self._clean(self._sanitize(entry.get('title')))                            
                             lecture         = "{0:03d} {1!s}".format(lecture_index, lecture_title)
                             unsafe_lecture  = u'{0:03d} '.format(lecture_index) + self._clean(entry.get('title'))
                             data            = asset.get('stream_urls')
@@ -582,6 +611,8 @@ class Udemy(ProgressBar):
                                 sources     = data.get('Video')
                                 tracks      = asset.get('captions')
                                 duration    = asset.get('time_estimation')
+                                subtitles   = self._extract_subtitles(tracks)
+                                sources     = self._extract_sources(sources)
                                 lectures.append({
                                     'lecture_index' :   lecture_index,
                                     'lectures_id' : lecture_id,
@@ -590,10 +621,10 @@ class Udemy(ProgressBar):
                                     'duration' : duration,
                                     'assets' : retVal,
                                     'assets_count' : len(retVal),
-                                    'sources' : self._extract_sources(sources),
-                                    'subtitles' : self._extract_subtitles(tracks),
-                                    'subtitle_count' : len(self._extract_subtitles(tracks)),
-                                    'sources_count' : len(self._extract_sources(sources)),
+                                    'sources' : sources,
+                                    'subtitles' : subtitles,
+                                    'subtitle_count' : len(subtitles),
+                                    'sources_count' : len(sources),
                                     })
                             else:
                                 lectures.append({
@@ -611,6 +642,7 @@ class Udemy(ProgressBar):
 
                     _udemy['chapters'][counter]['lectures'] = lectures
                     _udemy['chapters'][counter]['lectures_count'] = len(lectures)
+
                 elif clazz == 'quiz':
                     lecture_id          =   entry.get("id")
                     if len(_udemy['chapters']) == 0:
@@ -630,6 +662,7 @@ class Udemy(ProgressBar):
                             counter += 1
                     _udemy['chapters'][counter]['lectures'] = lectures
                     _udemy['chapters'][counter]['lectures_count'] = len(lectures)
+
             _udemy['total_chapters'] = len(_udemy['chapters'])
             _udemy['total_lectures'] = sum([entry.get('lectures_count', 0) for entry in _udemy['chapters'] if entry])
 
