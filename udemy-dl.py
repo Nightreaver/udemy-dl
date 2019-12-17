@@ -531,7 +531,13 @@ class Udemy(WebVtt2Srt, ProgressBar):
     def print_download_std(self, retval, lecture_title='', extension='mp4'):
         if retval:
             if 'rate' in retval:
-                sys.stdout.write (fc + sd + "[" + fm + sb + "+" + fc + sd + "] : " + fg + sd + "Downloaded " + fb + sb + "'{}' ({})".format(lecture_title, extension) + fg + sd + " at {:.1f} KB/s\n".format(retval.get('rate')))
+                rate = retval.get('rate')
+                if rate > 1024:
+                    rate = rate / 1024
+                    unit = 'MB'
+                else:
+                    unit = 'KB'
+                sys.stdout.write (fc + sd + "[" + fm + sb + "+" + fc + sd + "] : " + fg + sd + "Downloaded " + fb + sb + "'{}' ({})".format(lecture_title, extension) + fg + sd + " at {:.1f} {}/s in {:.0f} secs\n".format(rate, unit, retval.get('duration')))
             else:
                 sys.stdout.write (fc + sd + "[" + fm + sb + "+" + fc + sd + "] : " + fg + sd + "Downloaded " + fb + sb + "'{}'".format(lecture_title) + fy + sd + " ({})\n".format(retval.get('msg')))
         else:

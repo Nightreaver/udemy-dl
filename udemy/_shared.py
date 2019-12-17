@@ -231,7 +231,7 @@ class Downloader(object):
 
         if not self._active:
             os.rename(temp_filepath, filepath)
-            retVal = {"status": "True", "msg": "download", "rate": rate}
+            retVal = {"status": "True", "msg": "download", "rate": rate, "duration": elapsed}
 
         return retVal
 
