@@ -2,12 +2,12 @@
 
 '''
 
-Author 	: Nasir Khan (r0ot h3x49)
-Github 	: https://github.com/r0oth3x49
+Author 	: Nightreaver
+Github 	: https://github.com/Nightreaver
 License : MIT
 
 
-Copyright (c) 2018 Nasir Khan (r0ot h3x49)
+Copyright (c) 2019 Nightreaver
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the
 Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, 
@@ -32,9 +32,9 @@ def banner():
 %s%s / /_/ / /_/ /  __/ / / / / / /_/ /_____/ /_/ / /    
 %s%s \__,_/\__,_/\___/_/ /_/ /_/\__, /      \__,_/_/ (mod) 
 %s%s                           /____/
-                                 %s%sVersion : %s%s0.52b
-                                 %s%sAuthor  : %s%sNasir Khan (r0ot h3x49)
-                                 %s%sGithub  : %s%shttps://github.com/r0oth3x49
+                                 %s%sVersion : %s%s0.55
+                                 %s%sAuthor  : %s%sNightreaver
+                                 %s%sGithub  : %s%shttps://github.com/Nightreaver/udemy-dl  a forked from https://github.com/r0oth3x49/udemy-dl
 
 ''' % (fc, sb,fc, sb,fc, sb, fm, sb, fy, sb, fy, sb, fy,sd, fg, sd, fy, sd, fg, sd, fy, sd, fg, sd)
     return banner

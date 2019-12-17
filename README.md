@@ -1,8 +1,8 @@
-[![GitHub release](https://img.shields.io/badge/release-v0.5-brightgreen.svg?style=flat-square)](https://github.com/r0oth3x49/udemy-dl/releases/tag/v0.5)
-[![GitHub stars](https://img.shields.io/github/stars/r0oth3x49/udemy-dl.svg?style=flat-square)](https://github.com/r0oth3x49/udemy-dl/stargazers)
-[![GitHub forks](https://img.shields.io/github/forks/r0oth3x49/udemy-dl.svg?style=flat-square)](https://github.com/r0oth3x49/udemy-dl/network)
-[![GitHub issues](https://img.shields.io/github/issues/r0oth3x49/udemy-dl.svg?style=flat-square)](https://github.com/r0oth3x49/udemy-dl/issues)
-[![GitHub license](https://img.shields.io/github/license/r0oth3x49/udemy-dl.svg?style=flat-square)](https://github.com/r0oth3x49/udemy-dl/blob/master/LICENSE)
+[![GitHub release](https://img.shields.io/badge/release-v0.5-brightgreen.svg?style=flat-square)](https://github.com/nightreaver/udemy-dl/releases/tag/v0.5)
+[![GitHub stars](https://img.shields.io/github/stars/nightreaver/udemy-dl.svg?style=flat-square)](https://github.com/nightreaver/udemy-dl/stargazers)
+[![GitHub forks](https://img.shields.io/github/forks/nightreaver/udemy-dl.svg?style=flat-square)](https://github.com/nightreaver/udemy-dl/network)
+[![GitHub issues](https://img.shields.io/github/issues/nightreaver/udemy-dl.svg?style=flat-square)](https://github.com/nightreaver/udemy-dl/issues)
+[![GitHub license](https://img.shields.io/github/license/nightreaver/udemy-dl.svg?style=flat-square)](https://github.com/nightreaver/udemy-dl/blob/master/LICENSE)
 
 # udemy-dl
 **A cross-platform python based utility to download courses from udemy for personal offline use.**
@@ -28,6 +28,7 @@
 - Download/skip all available subtitles for a video (options: `--sub-only, --skip-sub`).
 - Download specific chapter in a course (option: `-c / --chapter`).
 - Download specific lecture in a chapter (option: `-l / --lecture`).
+- Download specific subtitle for a lecture (option: `-s / --sub-lang`).
 - Download chapter(s) by providing range in a course (option: `--chapter-start, --chapter-end`).
 - Download lecture(s) by providing range in a chapter (option: `--lecture-start, --lecture-end`).
 - Download lecture(s) in requested resolution (option: `-q / --quality`).
@@ -66,7 +67,7 @@
 
 You can download the latest version of udemy-dl by cloning the GitHub repository.
 
-	git clone https://github.com/r0oth3x49/udemy-dl.git
+	git clone https://github.com/nightreaver/udemy-dl.git
 
 
 ## ***Usage***
@@ -119,13 +120,17 @@ You can download the latest version of udemy-dl by cloning the GitHub repository
 
     python udemy-dl.py COURSE_URL -c NUMBER -l NUMBER --info
 
+***Download specific subtite by using language code such as (en, es) if lang switch is not specified then default will be all subtitles***
+
+    python udemy-dl.py COURSE_URL --sub-lang en
+
 
 ## **Advanced Usage**
 
 <pre><code>
 Author: Nasir khan (<a href="http://r0oth3x49.herokuapp.com/">r0ot h3x49</a>)
 
-usage: udemy-dl.py [-h] [-v] [-u] [-p] [-k] [-o] [-q] [-c] [-l]
+usage: udemy-dl.py [-h] [-v] [-u] [-p] [-k] [-o] [-q] [-c] [-l] [-s]
                    [--chapter-start] [--chapter-end] [--lecture-start]
                    [--lecture-end] [--save] [--info] [--cache] [--names]
                    [--unsafe] [--sub-only] [--skip-sub]
@@ -151,6 +156,7 @@ Advance:
   -q , --quality    Download specific video quality.
   -c , --chapter    Download specific chapter from course.
   -l , --lecture    Download specific lecture from chapter(s).
+  -s , --sub-lang   Download specific subtitle/caption (e.g:- en).
   --chapter-start   Download from specific position within course.
   --chapter-end     Download till specific position within course.
   --lecture-start   Download from specific position within chapter(s).
